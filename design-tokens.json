@@ -1,0 +1,110 @@
+{
+    "$schema": "https://tokens.studio/schemas/1.0.0/tokens.schema.json",
+    "metadata": {
+      "brand": "GoVisually",
+      "version": "1.0.1",
+      "source": "Style guide image (2025-08)",
+      "notes": "Values aligned to brand guide. Extended.underlineRed aliases the primary token to prevent drift."
+    },
+    "editorial": {
+      "copyCase": "sentence",
+      "description": "All marketing and product copy must be sentence case, not Title Case.",
+      "examples": {
+        "correct": "Review artwork faster",
+        "incorrect": "Review Artwork Faster"
+      }
+    },
+    "color": {
+      "brand": {
+        "primary": {
+          "cleanGrey": { "value": "#F5F5F5", "description": "Backgrounds for marketing and UI surfaces" },
+          "white": { "value": "#FFFFFF", "description": "Base background" },
+          "underlineRed": { "value": "#FC4E46", "description": "Primary accent / CTA" },
+          "black": { "value": "#000000", "description": "Text on light surfaces / hero blocks" }
+        },
+        "secondary": {
+          "postItYellow": { "value": "#FFD13C", "description": "Accent, warning, highlights" },
+          "gummyGrinPink": { "value": "#FFA3A3", "description": "Soft accent, backgrounds" },
+          "markerGreen": { "value": "#00BD6F", "description": "Success, positive states" },
+          "markerBlue": { "value": "#0D6ABE", "description": "Links, info emphasis" },
+          "highlightBlue": { "value": "#7BCDDA", "description": "Subtle info backgrounds" }
+        },
+        "extended": {
+          "underlineRed": { "value": "{color.brand.primary.underlineRed.value}", "description": "Alias to primary.underlineRed for extended palette references" },
+          "mustardYellow": { "value": "#EF9400", "description": "Illustrations/data viz" },
+          "brightOrange": { "value": "#FF5E2B", "description": "Illustrations/data viz" },
+          "grammarGreen": { "value": "#009A5D", "description": "Illustrations/data viz" },
+          "darkGreen": { "value": "#005F50", "description": "Deep green accent; used sparingly" },
+          "darkBlue": { "value": "#24408E", "description": "Deep brand blue for backgrounds" },
+          "brownie": { "value": "#61350E", "description": "Brown accent for illustrations" }
+        },
+        "monochrome": {
+          "midnight": { "value": "#121212", "description": "UI dark background" },
+          "onyx": { "value": "#181818", "description": "UI dark surface" },
+          "charcoal": { "value": "#282828", "description": "UI dark surface alt" },
+          "darkGrey": { "value": "#333333", "description": "Body text on dark" },
+          "midGrey": { "value": "#B0B6BB", "description": "Borders, disabled on dark" },
+          "brightGrey": { "value": "#EDEDED", "description": "Borders, dividers on light" },
+          "cleanGrey": { "value": "#F5F5F5", "description": "UI surface light (alias brand.primary.cleanGrey)" },
+          "snowWhite": { "value": "#F9F9F9", "description": "Highest elevation light surface" }
+        }
+      },
+      "semantic": {
+        "background": {
+          "default": { "value": "{color.brand.primary.white.value}" },
+          "subtle": { "value": "{color.brand.primary.cleanGrey.value}" },
+          "inverse": { "value": "{color.brand.primary.black.value}" }
+        },
+        "text": {
+          "default": { "value": "#111111" },
+          "muted": { "value": "#4D4D4D" },
+          "onInverse": { "value": "{color.brand.primary.white.value}" }
+        },
+        "interactive": {
+          "primary": { "value": "{color.brand.primary.underlineRed.value}" },
+          "primaryHover": { "value": "#E0453E" },
+          "link": { "value": "{color.brand.secondary.markerBlue.value}" },
+          "linkHover": { "value": "#0B5AA1" },
+          "focusRing": { "value": "{color.brand.secondary.highlightBlue.value}" }
+        },
+        "status": {
+          "success": { "value": "{color.brand.secondary.markerGreen.value}" },
+          "info": { "value": "{color.brand.secondary.markerBlue.value}" },
+          "warning": { "value": "{color.brand.secondary.postItYellow.value}" },
+          "danger": { "value": "{color.brand.primary.underlineRed.value}" }
+        }
+      }
+    },
+    "dataViz": {
+      "categorical": {
+        "series": {
+          "0": { "value": "{color.brand.secondary.markerBlue.value}" },
+          "1": { "value": "{color.brand.secondary.markerGreen.value}" },
+          "2": { "value": "{color.brand.extended.mustardYellow.value}" },
+          "3": { "value": "{color.brand.extended.brightOrange.value}" },
+          "4": { "value": "{color.brand.primary.underlineRed.value}" },
+          "5": { "value": "{color.brand.extended.darkBlue.value}" },
+          "6": { "value": "{color.brand.extended.grammarGreen.value}" },
+          "7": { "value": "{color.brand.secondary.gummyGrinPink.value}" }
+        }
+      }
+    },
+    "contexts": {
+      "marketing": {
+        "proportions": {
+          "neutral": 0.65,
+          "primaryAccent": 0.15,
+          "secondaryAccents": 0.15,
+          "extended": 0.05
+        },
+        "notes": "Use neutrals (white/cleanGrey/black) as dominant. Underline Red as main CTA/accent. Secondary as pops. Extended for depth/illustration."
+      },
+      "product": {
+        "proportions": {
+          "monochrome": 0.90,
+          "brandAccents": 0.10
+        },
+        "notes": "UI should be mostly monochrome; use brand colors for semantics (CTA, status, links) and illustrations."
+      }
+    }
+  }

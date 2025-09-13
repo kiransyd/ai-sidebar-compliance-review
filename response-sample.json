@@ -1,0 +1,278 @@
+{
+    "total_rules_checked": 16,
+    "rules_passed": 11,
+    "rules_failed": 4,
+    "kb_rules_used": true,
+    "has_bbox": true,
+    "critical_issues": 3,
+    "rule_checks": [
+      {
+        "rule_id": "VR-001",
+        "rule_title": "Presence of Regulatory Address Information",
+        "status": "PASSED",
+        "finding": "Found regulatory addresses for USA, Australia, and New Zealand: '3M Company 2510 Conway Avenue St. Paul, MN 55144 USA', '3M Australia Pty Ltd Building A, 1 Rivett Road North Ryde, NSW 2113', '3M New Zealand Ltd 94 Apollo Drive Rosedale, Auckland 0632'",
+        "location": {
+          "page": 1,
+          "text_found": "3M Company 2510 Conway Avenue St. Paul, MN 55144 USA",
+          "bbox": [
+            365.68,
+            218.27,
+            419.62,
+            230.89
+          ]
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-002",
+        "rule_title": "Presence of Regulatory Phone Number",
+        "status": "FAILED",
+        "finding": "Found phone number '1-800-537-2192' but required phone number is '1-800-537-2191'",
+        "location": {
+          "page": 1,
+          "text_found": "Questions? 1-800-537-219",
+          "bbox": [
+            365.68,
+            194.06,
+            425.75,
+            201.38
+          ]
+        },
+        "compliant": false,
+        "recommendation": "Update phone number from '1-800-537-2192' to '1-800-537-2191' as specified in requirements"
+      },
+      {
+        "rule_id": "VR-003",
+        "rule_title": "Presence and Format of Bar Code/UPC/GTIN",
+        "status": "PASSED",
+        "finding": "Found required GTIN '34-8726-5740-7' in correct format",
+        "location": {
+          "page": 1,
+          "text_found": "34-8726-5740-7",
+          "bbox": [
+            365.68,
+            258.58,
+            401.91,
+            265.9
+          ]
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-004",
+        "rule_title": "UDI Assessment Requirement – FDA Compliance",
+        "status": "PASSED",
+        "finding": "GTIN '34-8726-5740-7' appears to be formatted for FDA UDI Class I compliance and UPC barcode '051131995246' is present",
+        "location": {
+          "page": 1,
+          "text_found": "34-8726-5740-7",
+          "bbox": [
+            365.68,
+            258.58,
+            401.91,
+            265.9
+          ]
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-005",
+        "rule_title": "CE Mark Not Required Statement",
+        "status": "PASSED",
+        "finding": "No CE mark found on packaging, which is correct for this product/market",
+        "location": {
+          "page": 1,
+          "text_found": "No CE mark present",
+          "bbox": null
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-006",
+        "rule_title": "Claims Substantiation and Accuracy",
+        "status": "PASSED",
+        "finding": "Marketing claims present: 'Stays On In Water', 'seals out water, dirt, and germs', 'clear, brathable material', 'ultra-thin and comfortable', 'waterproof'",
+        "location": {
+          "page": 1,
+          "text_found": "Stays On In Water",
+          "bbox": [
+            462.68,
+            269.6,
+            544.52,
+            283.03
+          ]
+        },
+        "compliant": true,
+        "recommendation": "Ensure all claims are substantiated with appropriate documentation"
+      },
+      {
+        "rule_id": "VR-007",
+        "rule_title": "Follow Brand Guidelines",
+        "status": "PASSED",
+        "finding": "Packaging uses 3M brand colors (blue #00a0e0, white #ffffff) and product appears to be clearly visible",
+        "location": {
+          "page": 1,
+          "text_found": "Brand colors and visibility confirmed",
+          "bbox": null
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-008",
+        "rule_title": "Country of Origin Declaration",
+        "status": "PASSED",
+        "finding": "Found exact required text: 'Made in USA with globally sourced materials.'",
+        "location": {
+          "page": 1,
+          "text_found": "Made in USA with globally sourced materials.",
+          "bbox": [
+            365.68,
+            236.57,
+            426.3,
+            249.4
+          ]
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-009",
+        "rule_title": "Display Imperial and Metric Measurements",
+        "status": "PASSED",
+        "finding": "All dimensions include both imperial and metric units: '0.88 in x 1.1 in 22 mm x 28 mm', '1.06 in x 2.25 in 26 mm x 57 mm', '1.25 in x 2.5 in 31 mm x 63 mm'",
+        "location": {
+          "page": 1,
+          "text_found": "0.88 in x 1.1 in",
+          "bbox": [
+            610.37,
+            448.44,
+            638.37,
+            455.77
+          ]
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-010",
+        "rule_title": "Recycling Symbol on Packaging",
+        "status": "FAILED",
+        "finding": "No recycling symbol found in the document text or mentioned in design assets",
+        "location": {
+          "page": 1,
+          "text_found": "No recycling symbol found",
+          "bbox": null
+        },
+        "compliant": false,
+        "recommendation": "Add recycling symbol to packaging design to indicate environmental compliance"
+      },
+      {
+        "rule_id": "VR-011",
+        "rule_title": "Ingredients Not Made with Natural Rubber Latex Statement",
+        "status": "PASSED",
+        "finding": "Found exact required statement: 'Not Made With Natural Rubber Latex'",
+        "location": {
+          "page": 1,
+          "text_found": "Not Made With Natural Rubber Latex",
+          "bbox": [
+            278.81,
+            447.77,
+            323.35,
+            454.56
+          ]
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-012",
+        "rule_title": "Presence of Instructions for Use",
+        "status": "PASSED",
+        "finding": "Found all required instruction keywords: 'Apply', 'Remove', 'Press to Seal', 'Peel'",
+        "location": {
+          "page": 1,
+          "text_found": "Apply",
+          "bbox": [
+            676.83,
+            265.94,
+            689.25,
+            272.57
+          ]
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-013",
+        "rule_title": "Presence of Lot Code or Expiration/Date of Manufacture",
+        "status": "FAILED",
+        "finding": "No lot code, expiration date, or date of manufacture found in the required format (LOT/EXP/DOM followed by alphanumeric code)",
+        "location": {
+          "page": 1,
+          "text_found": "No traceability code found",
+          "bbox": null
+        },
+        "compliant": false,
+        "recommendation": "Add lot code, expiration date, or date of manufacture in the approved format (e.g., 'LOT: ABCD1', 'EXP: 2F9D2', or 'DOM ABC123')"
+      },
+      {
+        "rule_id": "VR-014",
+        "rule_title": "Trademark Name and Symbol Display",
+        "status": "PARTIAL",
+        "finding": "Found 'TM' symbols but not the required '3M™' and 'Nexcare™' format. Found '3M' and 'TM' separately",
+        "location": {
+          "page": 1,
+          "text_found": "TM",
+          "bbox": [
+            189.96,
+            154.49,
+            195.57,
+            160.19
+          ]
+        },
+        "compliant": false,
+        "recommendation": "Ensure both '3M™' and 'Nexcare™' appear with proper trademark symbols attached directly to the brand names"
+      },
+      {
+        "rule_id": "VR-015",
+        "rule_title": "Presence of Safety and Precaution Statements",
+        "status": "PASSED",
+        "finding": "Found all required safety statements: 'Sterility guaranteed unless individual wrapper is opened or damaged', 'For repeated application to the same site, rotate bandage placement', 'Always read the label, if symptoms persist see a healthcare professional'",
+        "location": {
+          "page": 1,
+          "text_found": "Sterility guaranteed unless individual wrapper is opened or damaged.",
+          "bbox": [
+            365.69,
+            341.2,
+            437.37,
+            348.53
+          ]
+        },
+        "compliant": true,
+        "recommendation": "None"
+      },
+      {
+        "rule_id": "VR-016",
+        "rule_title": "Presence of Product Application Instruction Diagrams",
+        "status": "PASSED",
+        "finding": "Application instruction text present with step-by-step guidance: 'Easy to Apply', 'Apply', 'Press to Seal', 'Peel', 'Remove'",
+        "location": {
+          "page": 1,
+          "text_found": "Easy to Apply",
+          "bbox": [
+            677.17,
+            194.43,
+            731.92,
+            207.86
+          ]
+        },
+        "compliant": true,
+        "recommendation": "None"
+      }
+    ]
+  }
