@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -22,6 +22,14 @@ import {
   ArrowLeft,
   Paperclip,
   Smile,
+  Search,
+  Check,
+  Eye,
+  Settings,
+  ThumbsUp,
+  ThumbsDown,
+  Expand,
+  Minimize2,
 } from "lucide-react"
 
 // Sample backend response data
@@ -140,10 +148,20 @@ export default function HomePage() {
       id: 1,
       type: "bot",
       message: "Hi! I'm Pixl, your compliance assistant. I can help you understand FDA requirements and fix any issues with your product label. What would you like to know?",
-      timestamp: new Date()
+      timestamp: "2024-01-15T13:42:00Z" // Fixed timestamp to prevent hydration issues
     }
   ])
   const [filterStatus, setFilterStatus] = useState<"all" | "passed" | "failed" | "partial">("all")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
+  const [isTyping, setIsTyping] = useState(false)
+  const [isChatExpanded, setIsChatExpanded] = useState(false)
+  const [currentUser, setCurrentUser] = useState({
+    firstName: 'User',
+    lastName: 'Name',
+    initials: 'UN'
+  })
 
   // Calculate statistics
   const totalRules = complianceData.total_rules_checked
@@ -200,6 +218,135 @@ export default function HomePage() {
     }
   }
 
+  // Enhanced UI helper functions
+  const getStatusVisual = (status: string) => {
+    const visuals: Record<string, { icon: any; color: string; animation: string; bgColor: string }> = {
+      'PASSED': { icon: CheckCircle, color: '#00BD6F', animation: 'pulse', bgColor: '#F0F9F4' },
+      'FAILED': { icon: AlertCircle, color: '#FC4E46', animation: 'shake', bgColor: '#FFF5F5' },
+      'PARTIAL': { icon: Clock, color: '#FFD13C', animation: 'glow', bgColor: '#FFF9E6' }
+    }
+    return visuals[status] || visuals['PARTIAL']
+  }
+
+  const getSeverityLevel = (status: string) => {
+    switch (status) {
+      case "FAILED":
+        return "critical"
+      case "PARTIAL":
+        return "warning"
+      case "PASSED":
+        return "success"
+      default:
+        return "info"
+    }
+  }
+
+  const simulateAnalysis = () => {
+    setIsAnalyzing(true)
+    setAnalysisProgress(0)
+    
+    const interval = setInterval(() => {
+      setAnalysisProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval)
+          setIsAnalyzing(false)
+          return 100
+        }
+        return prev + 10
+      })
+    }, 200)
+  }
+
+  // Helper function to get consistent timestamp
+  const getCurrentTimestamp = () => {
+    return new Date().toISOString()
+  }
+
+  // Enhanced chat functions inspired by Pixl design
+  const generateUserInitials = (firstName: string, lastName: string) => {
+    if (!firstName || !lastName) return 'UN'
+    const firstInitial = firstName.charAt(0).toUpperCase()
+    const lastInitial = lastName.charAt(0).toUpperCase()
+    return firstInitial + lastInitial
+  }
+
+  const setUserName = (firstName: string, lastName: string) => {
+    setCurrentUser({
+      firstName: firstName || 'User',
+      lastName: lastName || 'Name',
+      initials: generateUserInitials(firstName, lastName)
+    })
+  }
+
+  const getContextualResponse = (userMessage: string) => {
+    const contextualResponses: Record<string, string> = {
+      "Check FDA compliance": "Great question! FDA compliance covers several key areas. What specific product type are you working with? Food, supplements, cosmetics, or medical devices?",
+      "Review EU standards": "EU standards can be quite different from FDA requirements. Are you looking at food labeling, cosmetics, or another category? I can help you navigate the specific regulations.",
+      "Allergen requirements": "Allergen labeling is crucial for safety. The major allergens that must be declared include milk, eggs, fish, shellfish, tree nuts, peanuts, wheat, and soybeans. What's your specific concern?",
+      "Nutrition facts format": "Nutrition facts formatting has specific requirements for font size, spacing, and layout. Are you designing a new label or updating an existing one?",
+    }
+
+    for (const [key, response] of Object.entries(contextualResponses)) {
+      if (userMessage.toLowerCase().includes(key.toLowerCase())) {
+        return response
+      }
+    }
+    
+    const responses = [
+      "I can help you check that artwork for compliance issues. Could you upload the label image or share the specific requirements you need to verify?",
+      "Based on the compliance standards, I've found a few areas that need attention. The allergen information should be bolded, and the nutrition facts need proper spacing.",
+      "Perfect! Your label meets all the required standards. The ingredient list is properly formatted and all mandatory information is clearly visible.",
+      "I notice this might be for the Australian market. Let me check it against ACCC guidelines and food labeling requirements.",
+    ]
+    
+    const followUpQuestions = [
+      "Would you like me to check any specific compliance areas?",
+      "Do you have a particular product category in mind?",
+      "Should I focus on any specific regulatory body?",
+      "Would you like me to review a sample label for you?",
+    ]
+    
+    const baseResponse = responses[Math.floor(Math.random() * responses.length)]
+    const followUp = followUpQuestions[Math.floor(Math.random() * followUpQuestions.length)]
+    return `${baseResponse}\n\n${followUp}`
+  }
+
+  const typeMessage = (message: string) => {
+    setIsTyping(true)
+    const newMessage = {
+      id: chatMessages.length + 1,
+      type: "bot" as const,
+      message: "",
+      timestamp: getCurrentTimestamp()
+    }
+    setChatMessages(prev => [...prev, newMessage])
+    
+    let charIndex = 0
+    const typingSpeed = 25
+    
+    const type = () => {
+      if (charIndex < message.length) {
+        setChatMessages(prev => 
+          prev.map((msg, index) => 
+            index === prev.length - 1 
+              ? { ...msg, message: message.substring(0, charIndex + 1) }
+              : msg
+          )
+        )
+        charIndex++
+        setTimeout(type, typingSpeed + Math.random() * 15 - 7)
+      } else {
+        setIsTyping(false)
+      }
+    }
+    type()
+  }
+
+  const askQuestion = (question: string) => {
+    setChatMessage(question)
+    handleSendMessage()
+  }
+
   const toggleReason = (itemId: number) => {
     const newOpenReasons = new Set(openReasons)
     if (newOpenReasons.has(itemId)) {
@@ -226,21 +373,17 @@ export default function HomePage() {
         id: chatMessages.length + 1,
         type: "user" as const,
         message: chatMessage,
-        timestamp: new Date()
+        timestamp: getCurrentTimestamp()
       }
-      setChatMessages([...chatMessages, newMessage])
+      setChatMessages(prev => [...prev, newMessage])
+      const userMessage = chatMessage
       setChatMessage("")
       
-      // Simulate bot response
+      // Simulate bot response with enhanced typing animation
       setTimeout(() => {
-        const botResponse = {
-          id: chatMessages.length + 2,
-          type: "bot" as const,
-          message: "I understand your question about the compliance issue. Let me help you with that. Based on the validation rules, I can see that the phone number needs to be updated to match FDA records. Would you like me to provide more specific guidance?",
-          timestamp: new Date()
-        }
-        setChatMessages(prev => [...prev, botResponse])
-      }, 1000)
+        const responseContent = getContextualResponse(userMessage)
+        typeMessage(responseContent)
+      }, 1000 + Math.random() * 1000)
     }
   }
 
@@ -319,13 +462,55 @@ export default function HomePage() {
             </div>
 
             <div className="p-6">
-              {/* Statistics Overview */}
+              {/* Enhanced Statistics Overview with Executive Summary */}
               <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-[#111111]">Validation results</h3>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold text-[#00BD6F]">{passRate}%</span>
-                    <span className="text-[#4D4D4D] text-sm">pass rate</span>
+                {/* Executive Summary - Always Visible */}
+                <div className="bg-gradient-to-r from-[#F3F8FC] to-[#F0F9F4] rounded-xl p-6 mb-6 border border-[#E7F0F8]">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-[#111111]">Compliance overview</h3>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-[#00BD6F]">{passRate}%</div>
+                        <div className="text-[#4D4D4D] text-sm">pass rate</div>
+                      </div>
+                      <div className="w-16 h-16 relative">
+                        <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+                          <path
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="#E5E7EB"
+                            strokeWidth="2"
+                          />
+                          <path
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="#00BD6F"
+                            strokeWidth="2"
+                            strokeDasharray={`${passRate}, 100`}
+                            className="transition-all duration-1000 ease-out"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold text-[#00BD6F]">{passRate}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Quick Stats Row */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-[#FC4E46]">{failedRules}</div>
+                      <div className="text-xs text-[#4D4D4D]">Critical issues</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-[#FFD13C]">{partialRules}</div>
+                      <div className="text-xs text-[#4D4D4D]">Warnings</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-[#0D6ABE]">{totalRules}</div>
+                      <div className="text-xs text-[#4D4D4D]">Total rules</div>
+                    </div>
                   </div>
                 </div>
                 
@@ -357,39 +542,104 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Filter Buttons */}
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    variant={filterStatus === "all" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setFilterStatus("all")}
-                    className={filterStatus === "all" ? "bg-[#0D6ABE] text-white" : ""}
-                  >
-                    All ({totalRules})
-                  </Button>
-                  <Button
-                    variant={filterStatus === "failed" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setFilterStatus("failed")}
-                    className={filterStatus === "failed" ? "bg-[#FC4E46] text-white" : "border-[#FC4E46] text-[#FC4E46]"}
-                  >
-                    Failed ({failedRules})
-                  </Button>
-                  <Button
-                    variant={filterStatus === "passed" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setFilterStatus("passed")}
-                    className={filterStatus === "passed" ? "bg-[#00BD6F] text-white" : "border-[#00BD6F] text-[#00BD6F]"}
-                  >
-                    Passed ({passedRules})
-                  </Button>
+                {/* Enhanced Filter System with Smart Search */}
+                <div className="space-y-4">
+                  {/* Smart Search */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#4D4D4D] w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search rules, violations, or recommendations..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-[#EDEDED] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BCDDA] focus:border-transparent"
+                    />
+                  </div>
+                  
+                  {/* Visual Filter Pills */}
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant={filterStatus === "all" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("all")}
+                      className={`rounded-full px-4 py-2 transition-all duration-200 ${
+                        filterStatus === "all" 
+                          ? "bg-[#0D6ABE] text-white shadow-md" 
+                          : "border-[#0D6ABE] text-[#0D6ABE] hover:bg-[#F3F8FC]"
+                      }`}
+                    >
+                      All ({totalRules})
+                    </Button>
+                    <Button
+                      variant={filterStatus === "failed" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("failed")}
+                      className={`rounded-full px-4 py-2 transition-all duration-200 ${
+                        filterStatus === "failed" 
+                          ? "bg-[#FC4E46] text-white shadow-md" 
+                          : "border-[#FC4E46] text-[#FC4E46] hover:bg-[#FFF5F5]"
+                      }`}
+                    >
+                      Critical ({failedRules})
+                    </Button>
+                    <Button
+                      variant={filterStatus === "passed" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("passed")}
+                      className={`rounded-full px-4 py-2 transition-all duration-200 ${
+                        filterStatus === "passed" 
+                          ? "bg-[#00BD6F] text-white shadow-md" 
+                          : "border-[#00BD6F] text-[#00BD6F] hover:bg-[#F0F9F4]"
+                      }`}
+                    >
+                      Passed ({passedRules})
+                    </Button>
+                    <Button
+                      variant={filterStatus === "partial" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("partial")}
+                      className={`rounded-full px-4 py-2 transition-all duration-200 ${
+                        filterStatus === "partial" 
+                          ? "bg-[#FFD13C] text-white shadow-md" 
+                          : "border-[#FFD13C] text-[#FFD13C] hover:bg-[#FFF9E6]"
+                      }`}
+                    >
+                      Warnings ({partialRules})
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              <Button className="w-full bg-[#FC4E46] hover:bg-[#E0453E] text-white mb-6 font-medium transition-all duration-200 shadow-sm hover:shadow-md">
-                <Edit3 className="w-4 h-4 mr-2" />
-                Auto compliance check
-              </Button>
+              {/* Enhanced Auto Compliance Check Button */}
+              <div className="mb-6">
+                <Button 
+                  onClick={simulateAnalysis}
+                  disabled={isAnalyzing}
+                  className="w-full bg-[#FC4E46] hover:bg-[#E0453E] text-white font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Analyzing compliance... {analysisProgress}%
+                    </>
+                  ) : (
+                    <>
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Auto compliance check
+                    </>
+                  )}
+                </Button>
+                
+                {/* Progress Bar for Analysis */}
+                {isAnalyzing && (
+                  <div className="mt-3 w-full bg-[#F5F5F5] rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-[#FC4E46] to-[#FFD13C] h-2 rounded-full transition-all duration-200"
+                      style={{ width: `${analysisProgress}%` }}
+                    />
+                  </div>
+                )}
+              </div>
 
               <div className="space-y-3 mb-8">
                 {filteredRules.map((rule, index) => (
@@ -407,7 +657,12 @@ export default function HomePage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             {getStatusIcon(rule.status)}
-                            <span className="font-medium text-[#111111]">{rule.rule_id}. {rule.rule_title.toLowerCase()}</span>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs text-[#6B7280] bg-[#F3F4F6] px-2 py-1 rounded font-mono">{rule.rule_id}</span>
+                              </div>
+                              <span className="font-medium text-[#111111]">{rule.rule_title.toLowerCase()}</span>
+                            </div>
                           </div>
                           <Badge variant="outline" className={`${getStatusColor(rule.status)}`}>
                             {getStatusText(rule.status)}
@@ -496,14 +751,7 @@ export default function HomePage() {
                                   </div>
                                   <div className="flex gap-2">
                                     <Button size="sm" className="bg-[#FC4E46] hover:bg-[#E0453E] text-white">
-                                      Apply fix
-                                    </Button>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="text-[#0D6ABE] border-[#0D6ABE] bg-transparent hover:bg-[#F3F8FC]"
-                                    >
-                                      Preview <ChevronDown className="w-3 h-3 ml-1" />
+                                      Markup
                                     </Button>
                                   </div>
                                 </div>
@@ -605,103 +853,196 @@ export default function HomePage() {
       {/* Chat Interface */}
       <div
         className={`
-        fixed top-0 right-0 h-full w-[480px] bg-white shadow-2xl z-[70] transform transition-transform duration-300 ease-in-out
+        fixed top-0 right-0 h-full bg-white shadow-2xl z-[70] transform transition-all duration-300 ease-in-out
         ${isChatOpen ? "translate-x-0" : "translate-x-full"}
+        ${isChatExpanded ? "w-full" : "w-[480px]"}
       `}
         role="dialog"
         aria-modal="true"
         aria-labelledby="chat-title"
       >
         <div className="flex flex-col h-full">
-          {/* Chat Header */}
-          <div className="flex items-center justify-between p-6 border-b border-[#EDEDED] bg-white">
+          {/* Enhanced Chat Header with Pixl Avatar */}
+          <div className="bg-[#000000] text-white p-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsChatOpen(false)}
-                className="h-8 w-8 p-0 hover:bg-[#F5F5F5] transition-colors"
+                className="h-8 w-8 p-0 text-white hover:bg-white/10"
                 aria-label="Back to compliance review"
               >
-                <ArrowLeft className="h-4 w-4 text-[#4D4D4D]" />
+                <ArrowLeft className="h-4 w-4" />
               </Button>
+              {/* Pixl Avatar */}
+              <div className="w-10 h-10 relative grid grid-cols-6 grid-rows-6 gap-px bg-white/10 rounded-lg overflow-hidden">
+                {Array.from({ length: 36 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white transition-all duration-200"
+                    style={{
+                      opacity: Math.random() > 0.3 ? 1 : 0.3,
+                      animation: isTyping ? 'pulse 1s infinite' : 'none'
+                    }}
+                  />
+                ))}
+              </div>
               <div>
-                <h2 id="chat-title" className="text-xl font-bold text-[#111111]">Chat with Pixl</h2>
-                <p className="text-sm text-[#4D4D4D]">Your compliance assistant</p>
+                <h2 id="chat-title" className="text-lg font-semibold">Pixl</h2>
+                <p className="text-sm opacity-90">
+                  {isTyping ? 'Typing...' : 'I\'m here to help'}
+                </p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsChatOpen(false)}
-              className="h-8 w-8 p-0 hover:bg-[#F5F5F5] transition-colors"
-              aria-label="Close chat"
-            >
-              <X className="h-4 w-4 text-[#4D4D4D]" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setUserName('Jim', 'Bloggs')}
+                className="h-8 w-8 p-0 text-white hover:bg-white/10"
+                aria-label="Demo user names"
+              >
+                <Users className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsChatExpanded(!isChatExpanded)}
+                className="h-8 w-8 p-0 text-white hover:bg-white/10"
+                aria-label={isChatExpanded ? "Minimize chat" : "Expand chat"}
+              >
+                {isChatExpanded ? <Minimize2 className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsChatOpen(false)}
+                className="h-8 w-8 p-0 text-white hover:bg-white/10"
+                aria-label="Close chat"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
-          {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {/* Quick Actions */}
+          <div className="p-4 bg-[#F9F9F9] border-b border-[#EDEDED]">
+            <div className={`flex flex-wrap gap-2 ${isChatExpanded ? 'max-w-4xl mx-auto' : ''}`}>
+              <button
+                onClick={() => askQuestion('Check FDA compliance')}
+                className="px-3 py-1.5 text-xs font-medium bg-white border border-[#EDEDED] rounded-full hover:bg-[#0D6ABE] hover:text-white hover:border-[#0D6ABE] transition-all duration-200"
+              >
+                Check FDA compliance
+              </button>
+              <button
+                onClick={() => askQuestion('Review EU standards')}
+                className="px-3 py-1.5 text-xs font-medium bg-white border border-[#EDEDED] rounded-full hover:bg-[#0D6ABE] hover:text-white hover:border-[#0D6ABE] transition-all duration-200"
+              >
+                Review EU standards
+              </button>
+              <button
+                onClick={() => askQuestion('Allergen requirements')}
+                className="px-3 py-1.5 text-xs font-medium bg-white border border-[#EDEDED] rounded-full hover:bg-[#0D6ABE] hover:text-white hover:border-[#0D6ABE] transition-all duration-200"
+              >
+                Allergen requirements
+              </button>
+              <button
+                onClick={() => askQuestion('Nutrition facts format')}
+                className="px-3 py-1.5 text-xs font-medium bg-white border border-[#EDEDED] rounded-full hover:bg-[#0D6ABE] hover:text-white hover:border-[#0D6ABE] transition-all duration-200"
+              >
+                Nutrition facts format
+              </button>
+            </div>
+          </div>
+
+          {/* Enhanced Chat Messages */}
+          <div className={`flex-1 overflow-y-auto p-4 space-y-3 ${isChatExpanded ? 'max-w-4xl mx-auto w-full' : ''}`}>
             {chatMessages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex gap-3 ${msg.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    msg.type === 'user'
-                      ? 'bg-[#0D6ABE] text-white'
+                {/* Avatar */}
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${
+                  msg.type === 'user' 
+                    ? 'bg-[#0D6ABE] text-white' 
+                    : 'bg-[#F5F5F5] text-[#4D4D4D]'
+                }`}>
+                  {msg.type === 'user' ? currentUser.initials : 'P'}
+                </div>
+                
+                {/* Message Content */}
+                <div className={`max-w-[80%] ${msg.type === 'user' ? 'items-end' : 'items-start'} flex flex-col`}>
+                  <div className={`relative group ${
+                    msg.type === 'user' 
+                      ? 'bg-[#FC4E46] text-white' 
                       : 'bg-[#F5F5F5] text-[#111111]'
-                  }`}
-                >
-                  <p className="text-sm leading-relaxed">{msg.message}</p>
-                  <p className={`text-xs mt-1 ${
-                    msg.type === 'user' ? 'text-blue-100' : 'text-[#4D4D4D]'
+                  } rounded-2xl px-4 py-3 shadow-sm`}>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
+                    
+                    {/* Copy Button */}
+                    <button
+                      onClick={() => navigator.clipboard.writeText(msg.message)}
+                      className="absolute -right-8 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-[#EDEDED] hover:bg-[#D1D5DB] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    >
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <p className={`text-xs mt-1 px-1 ${
+                    msg.type === 'user' ? 'text-[#4D4D4D]' : 'text-[#6B7280]'
                   }`}>
-                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                   </p>
                 </div>
               </div>
             ))}
+            
+            {/* Typing Indicator */}
+            {isTyping && (
+              <div className="flex gap-3">
+                <div className="w-8 h-8 bg-[#F5F5F5] rounded-full flex items-center justify-center text-xs font-semibold text-[#4D4D4D]">
+                  P
+                </div>
+                <div className="bg-[#F5F5F5] rounded-2xl px-4 py-3 shadow-sm">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-[#0D6ABE] rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-[#0D6ABE] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-[#0D6ABE] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Chat Input */}
-          <div className="border-t border-[#EDEDED] p-6 bg-white">
-            <div className="flex items-end gap-3">
+          {/* Enhanced Chat Input */}
+          <div className="border-t border-[#EDEDED] p-4 bg-white">
+            <div className={`flex items-end gap-3 ${isChatExpanded ? 'max-w-4xl mx-auto' : ''}`}>
               <div className="flex-1 relative">
                 <textarea
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask Pixl about compliance issues..."
-                  className="w-full p-3 border border-[#EDEDED] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#7BCDDA] focus:border-transparent"
-                  rows={2}
+                  placeholder="Ask me about compliance..."
+                  className="w-full p-3 pr-12 border border-[#EDEDED] rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-[#0D6ABE] focus:border-transparent transition-all duration-200"
+                  rows={1}
+                  style={{ minHeight: '44px', maxHeight: '120px' }}
                 />
-                <div className="absolute right-2 bottom-2 flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 hover:bg-[#F5F5F5]"
-                  >
-                    <Paperclip className="h-3 w-3 text-[#4D4D4D]" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 hover:bg-[#F5F5F5]"
-                  >
-                    <Smile className="h-3 w-3 text-[#4D4D4D]" />
-                  </Button>
+                <div className="absolute right-3 bottom-3 flex gap-1">
+                  <button className="w-6 h-6 bg-[#F5F5F5] hover:bg-[#E5E7EB] rounded-full flex items-center justify-center transition-colors duration-200">
+                    <Paperclip className="h-3 w-3 text-[#6B7280]" />
+                  </button>
                 </div>
               </div>
-              <Button
+              <button
                 onClick={handleSendMessage}
                 disabled={!chatMessage.trim()}
-                className="bg-[#FC4E46] hover:bg-[#E0453E] text-white px-4 py-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="w-10 h-10 bg-[#FC4E46] hover:bg-[#E0453E] disabled:bg-[#D1D5DB] disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
               >
-                <Send className="w-4 h-4" />
-              </Button>
+                <Send className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
