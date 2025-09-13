@@ -90,6 +90,13 @@
   --color-semantic-status-info: var(--color-brand-secondary-marker-blue);
   --color-semantic-status-warning: var(--color-brand-secondary-post-it-yellow);
   --color-semantic-status-danger: var(--color-brand-primary-underline-red);
+  
+  /* Rainbow Button Colors */
+  --color-1: 0 100% 63%;
+  --color-2: 270 100% 63%;
+  --color-3: 210 100% 63%;
+  --color-4: 195 100% 63%;
+  --color-5: 90 100% 63%;
 }
 
 .dark {
@@ -175,4 +182,18 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Rainbow Button Animation */
+@keyframes rainbow {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 200%;
+  }
+}
+
+.animate-rainbow {
+  animation: rainbow var(--speed, 2s) infinite linear;
 }
