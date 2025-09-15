@@ -22,7 +22,9 @@ import {
   ArrowLeft,
   Paperclip,
   Smile,
+  Sparkles,
 } from "lucide-react"
+import Link from "next/link"
 
 // Sample backend response data
 const complianceData = {
@@ -257,12 +259,23 @@ export default function HomePage() {
       <div className="flex items-center justify-center min-h-screen p-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-[#111111] mb-8">Welcome to GoVisually</h1>
-          <Button
-            onClick={() => setIsSheetOpen(true)}
-            className="bg-[#FC4E46] hover:bg-[#E0453E] text-white px-8 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
-          >
-            Open label compliance review
-          </Button>
+          <div className="space-y-4">
+            <Button
+              onClick={() => setIsSheetOpen(true)}
+              className="bg-[#FC4E46] hover:bg-[#E0453E] text-white px-8 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md block w-full max-w-sm mx-auto"
+            >
+              Open label compliance review
+            </Button>
+            <Link href="/mood-orbs">
+              <Button
+                variant="outline"
+                className="border-[#0D6ABE] text-[#0D6ABE] hover:bg-[#F3F8FC] px-8 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md block w-full max-w-sm mx-auto"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                View Mood Orbs Demo
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
