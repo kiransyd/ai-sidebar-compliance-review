@@ -200,7 +200,7 @@ export default function HomePage() {
   const [isGenerateReportSheetOpen, setIsGenerateReportSheetOpen] = useState(false)
   const [isShareTeamSheetOpen, setIsShareTeamSheetOpen] = useState(false)
   const [isConsultantSheetOpen, setIsConsultantSheetOpen] = useState(false)
-  const [selectedProfile, setSelectedProfile] = useState<any>(null)
+  const [selectedProfile, setSelectedProfile] = useState<unknown>(null)
   const [currentView, setCurrentView] = useState('consultants') // 'consultants' or 'profile'
   const [feedbackForm, setFeedbackForm] = useState({
     rating: 0,
@@ -290,7 +290,7 @@ export default function HomePage() {
 
   // Enhanced UI helper functions
   const getStatusVisual = (status: string) => {
-    const visuals: Record<string, { icon: any; color: string; animation: string; bgColor: string }> = {
+    const visuals: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; animation: string; bgColor: string }> = {
       'PASSED': { icon: CheckCircle, color: '#00BD6F', animation: 'pulse', bgColor: '#F0F9F4' },
       'FAILED': { icon: AlertCircle, color: '#FC4E46', animation: 'shake', bgColor: '#FFF5F5' },
       'PARTIAL': { icon: Clock, color: '#FFD13C', animation: 'glow', bgColor: '#FFF9E6' }
@@ -700,7 +700,7 @@ export default function HomePage() {
     setIsConsultantSheetOpen(false)
   }
 
-  const handleProfileOpen = (consultant: any) => {
+  const handleProfileOpen = (consultant: unknown) => {
     setSelectedProfile(consultant)
     setCurrentView('profile')
   }
@@ -803,28 +803,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Main Content */}
-<<<<<<< HEAD
-      <div className="flex items-center justify-center min-h-screen p-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-[#111111] mb-8">Welcome to GoVisually</h1>
-          <div className="space-y-4">
-            <Button
-              onClick={() => setIsSheetOpen(true)}
-              className="bg-[#FC4E46] hover:bg-[#E0453E] text-white px-8 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md block w-full max-w-sm mx-auto"
-            >
-              Open label compliance review
-            </Button>
-            <Link href="/mood-orbs">
-              <Button
-                variant="outline"
-                className="border-[#0D6ABE] text-[#0D6ABE] hover:bg-[#F3F8FC] px-8 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md block w-full max-w-sm mx-auto"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                View Mood Orbs Demo
-              </Button>
-            </Link>
-=======
       <div className="min-h-screen p-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
@@ -944,7 +922,6 @@ export default function HomePage() {
                 </div>
               )}
             </div>
->>>>>>> 009be4025ae2ababfbd7899492db4ba9dfcb7dcc
           </div>
         </div>
       </div>
@@ -992,7 +969,7 @@ export default function HomePage() {
               <p className="text-[#4D4D4D] text-sm leading-relaxed">
                 This is a <span className="text-[#0D6ABE] font-medium">food product label</span> for{" "}
                 <span className="text-[#0D6ABE] font-medium">Organic Granola Bars</span> manufactured by{" "}
-                <span className="text-[#00BD6F] font-medium">Nature's Best Foods</span>. The label requires compliance
+                <span className="text-[#00BD6F] font-medium">Nature&apos;s Best Foods</span>. The label requires compliance
                 with <span className="text-[#0D6ABE] font-medium">FDA regulations</span> for nutritional labeling,
                 ingredient disclosure, and <span className="text-[#0D6ABE] font-medium">allergen warnings</span> under{" "}
                 <span className="text-[#0D6ABE] font-medium">21 CFR Part 101</span>.
@@ -1229,7 +1206,7 @@ export default function HomePage() {
                           </p>
                           {rule.location.text_found && (
                             <p className="text-[#00BD6F] text-sm mt-2 font-medium">
-                              Found: "{rule.location.text_found}" (Page {rule.location.page})
+                              Found: &quot;{rule.location.text_found}&quot; (Page {rule.location.page})
                             </p>
                           )}
                       </div>
